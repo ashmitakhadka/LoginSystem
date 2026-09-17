@@ -7,6 +7,9 @@ import AdminDashboard from "./components/AdminDashboard";
 import SessionLogin from "./components/sessionlogin";
 import SessionDashboard from "./components/sessiondashboard";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import "./App.css";
 
 const App = () => {
@@ -35,10 +38,18 @@ const App = () => {
       path: "/session-login",
       element: <SessionLogin />,
     },
-    { path: "/session-dashboard", element: <SessionDashboard /> },
+    {
+      path: "/session-dashboard",
+      element: <SessionDashboard />,
+    },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <ToastContainer />
+      <RouterProvider router={router} />
+    </>
+  );
 };
 
 export default App;
