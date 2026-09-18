@@ -1,10 +1,10 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "../schemas/loginSchema";
-import { useState } from "react";
-import sessionApi from "../sessionApi";
-import { toast } from "react-toastify";
+import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema } from '../schemas/loginSchema';
+import { useState } from 'react';
+import sessionApi from '../sessionApi';
+import { toast } from 'react-toastify';
 
 const SessionLogin = () => {
   const {
@@ -23,20 +23,20 @@ const SessionLogin = () => {
 
     try {
       // Step 1: Get CSRF cookie
-      await sessionApi.get("/sanctum/csrf-cookie");
+      await sessionApi.get('/sanctum/csrf-cookie');
 
       // Step 2: Login
-      const response = await sessionApi.post("/api/session/login", data);
+      const response = await sessionApi.post('/api/session/login', data);
 
       // Success toast
-      toast.success(response.data.message || "Login successful!");
+      toast.success(response.data.message || 'Login successful!');
 
-      navigate("/session-dashboard");
+      navigate('/session-dashboard');
     } catch (error) {
-      console.log("Error posting data", error);
+      console.log('Error posting data', error);
 
       // Server error message
-      const message = error.response?.data?.message || "Login failed";
+      const message = error.response?.data?.message || 'Login failed';
 
       toast.error(message);
     } finally {
@@ -59,7 +59,7 @@ const SessionLogin = () => {
           id="email"
           placeholder="Enter your email"
           className="border border-gray-200 rounded-md p-2 focus:outline-none focus:ring-1"
-          {...register("email")}
+          {...register('email')}
         />
 
         {errors.email && (
@@ -75,7 +75,7 @@ const SessionLogin = () => {
           id="password"
           placeholder="Enter your password"
           className="border border-gray-200 rounded-md p-2 focus:outline-none focus:ring-1"
-          {...register("password")}
+          {...register('password')}
         />
 
         {errors.password && (
@@ -89,7 +89,7 @@ const SessionLogin = () => {
           disabled={loading}
           className="bg-blue-300 p-2 w-45 rounded-md focus:ring-blue-500 hover:bg-blue-600 self-center"
         >
-          {loading ? "Logging in..." : "Login (Session)"}
+          {loading ? 'Logging in...' : 'Login (Session)'}
         </button>
 
         <p className="flex justify-center gap-2">

@@ -1,29 +1,29 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
   const [user, setUser] = useState({
-    name: "Loading...",
-    role: "user",
+    name: 'Loading...',
+    role: 'user',
   });
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
 
       if (!token) {
-        navigate("/login");
+        navigate('/login');
         return;
       }
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/user-details", {
+        const response = await fetch('http://127.0.0.1:8000/api/user-details', {
           headers: {
             Authorization: `Bearer ${token}`,
-            Accept: "application/json",
+            Accept: 'application/json',
           },
         });
 
@@ -31,17 +31,17 @@ const Dashboard = () => {
           const data = await response.json();
           setUser(data.user);
         } else if (response.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("userRole");
+          localStorage.removeItem('token');
+          localStorage.removeItem('userRole');
 
-          toast.error("Session expired. Please login again.");
-          navigate("/login");
+          toast.error('Session expired. Please login again.');
+          navigate('/login');
         } else {
-          toast.error("Failed to load user information.");
+          toast.error('Failed to load user information.');
         }
       } catch (error) {
-        console.error("Failed to fetch user data", error);
-        toast.error("Unable to connect to the server.");
+        console.error('Failed to fetch user data', error);
+        toast.error('Unable to connect to the server.');
       }
     };
 
@@ -49,65 +49,65 @@ const Dashboard = () => {
   }, [navigate]);
 
   const handleLogout = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/logout", {
-        method: "POST",
+      const response = await fetch('http://127.0.0.1:8000/api/logout', {
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
-          Accept: "application/json",
+          Accept: 'application/json',
         },
       });
 
       if (response.ok) {
-        toast.success("Logged out successfully!");
+        toast.success('Logged out successfully!');
       } else {
-        toast.error("Logout failed.");
+        toast.error('Logout failed.');
       }
     } catch (error) {
-      console.error("Logout failed", error);
-      toast.error("Unable to logout from the server.");
+      console.error('Logout failed', error);
+      toast.error('Unable to logout from the server.');
     } finally {
       // Always remove local authentication data
-      localStorage.removeItem("token");
-      localStorage.removeItem("userRole");
+      localStorage.removeItem('token');
+      localStorage.removeItem('userRole');
 
-      navigate("/login");
+      navigate('/login');
     }
   };
 
   // Test protected admin route
   const testAdminRoute = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/admin/stats", {
+      const response = await fetch('http://127.0.0.1:8000/api/admin/stats', {
         headers: {
           Authorization: `Bearer ${token}`,
-          Accept: "application/json",
+          Accept: 'application/json',
         },
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(data.message || "Admin stats accessed successfully!");
+        toast.success(data.message || 'Admin stats accessed successfully!');
 
-        console.log("Admin stats:", data);
+        console.log('Admin stats:', data);
       } else if (response.status === 401) {
-        toast.error("You are not authenticated.");
-        localStorage.removeItem("token");
-        localStorage.removeItem("userRole");
-        navigate("/login");
+        toast.error('You are not authenticated.');
+        localStorage.removeItem('token');
+        localStorage.removeItem('userRole');
+        navigate('/login');
       } else if (response.status === 403) {
-        toast.error(data.message || "You are not authorized to access this.");
+        toast.error(data.message || 'You are not authorized to access this.');
       } else {
-        toast.error(data.message || "Unable to access admin stats.");
+        toast.error(data.message || 'Unable to access admin stats.');
       }
     } catch (error) {
-      console.error("Admin route error:", error);
-      toast.error("Unable to connect to the server.");
+      console.error('Admin route error:', error);
+      toast.error('Unable to connect to the server.');
     }
   };
 
@@ -133,16 +133,16 @@ const Dashboard = () => {
         {/* User role */}
         <span
           className={`px-3 py-1 rounded-full text-sm font-semibold ${
-            user.role === "admin"
-              ? "bg-purple-100 text-purple-800"
-              : "bg-gray-100 text-gray-800"
+            user.role === 'admin'
+              ? 'bg-purple-100 text-purple-800'
+              : 'bg-gray-100 text-gray-800'
           }`}
         >
           Role: {user.role.toUpperCase()}
         </span>
 
         {/* Admin-only button */}
-        {user.role === "admin" && (
+        {user.role === 'admin' && (
           <button
             onClick={testAdminRoute}
             className="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-600 transition flex items-center gap-2"
@@ -155,3 +155,4 @@ const Dashboard = () => {
     </>
   );
 };
+export default Dashboard;

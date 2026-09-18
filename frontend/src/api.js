@@ -1,33 +1,30 @@
 // src/api.js
 
-const BASE_URL = "http://127.0.0.1:8000/api";
+const BASE_URL = 'http://127.0.0.1:8000/api';
 
 export const apiFetch = async (endpoint, options = {}) => {
-    const token = localStorage.getItem('token');
-    
-   
-    const headers = {
-        "Accept": "application/json",
-        "Authorization": `Bearer ${token}`,
-        ...options.headers, 
-    };
+  const token = localStorage.getItem('token');
 
-    
-    if (options.body && typeof options.body === 'string') {
-        headers["Content-Type"] = "application/json";
-    }
+  const headers = {
+    Accept: 'application/json',
+    Authorization: `Bearer ${token}`,
+    ...options.headers,
+  };
 
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-        ...options,
-        headers,
-    });
+  if (options.body && typeof options.body === 'string') {
+    headers['Content-Type'] = 'application/json';
+  }
 
-    
-    if (response.status === 401) {
-        localStorage.removeItem('token');
-        window.location.href = '/login'; 
-        return null; 
-    }
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
 
-    return response;
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+    return null;
+  }
+
+  return response;
 };

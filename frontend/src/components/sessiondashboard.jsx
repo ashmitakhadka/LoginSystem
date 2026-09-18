@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import sessionApi from "../sessionApi";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import sessionApi from '../sessionApi';
 
 const SessionDashboard = () => {
   const navigate = useNavigate();
@@ -12,19 +12,19 @@ const SessionDashboard = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await sessionApi.get("/api/session/user-details");
+        const { data } = await sessionApi.get('/api/session/user-details');
 
         setUser(data.user);
       } catch (error) {
-        console.log("Error fetching user:", error);
+        console.log('Error fetching user:', error);
 
         if (error.response?.status === 401) {
-          navigate("/login");
+          navigate('/login');
           return;
         }
 
         toast.error(
-          error.response?.data?.message || "Unable to load user details",
+          error.response?.data?.message || 'Unable to load user details'
         );
       } finally {
         setLoading(false);
@@ -36,15 +36,15 @@ const SessionDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await sessionApi.post("/api/session/logout");
+      await sessionApi.post('/api/session/logout');
 
-      toast.success("Logged out successfully!");
+      toast.success('Logged out successfully!');
 
-      navigate("/login");
+      navigate('/login');
     } catch (error) {
-      console.log("Logout error:", error);
+      console.log('Logout error:', error);
 
-      toast.error(error.response?.data?.message || "Logout failed");
+      toast.error(error.response?.data?.message || 'Logout failed');
     }
   };
 
@@ -77,3 +77,5 @@ const SessionDashboard = () => {
     </>
   );
 };
+
+export default SessionDashboard;
