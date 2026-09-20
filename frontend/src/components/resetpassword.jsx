@@ -4,11 +4,22 @@ import { useForm } from 'react-hook-form';
 import { resetPasswordSchema } from '../schemas/resetPasswordSchema';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 
 export const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const { token } = useParams();
+  const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get('email')?.trim();
 
   const {
     register,
@@ -16,13 +27,46 @@ export const ResetPassword = () => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      email: email || '',
+    },
   });
 
-  const onSubmit = (data) => {
-    setLoading(true);
-    console.log(data);
-    setLoading(false);
+  const onSubmit = async (data) => {
+    const resetData = {
+      token: token,
+      email: data.email.trim(),
+      password: data.password,
+      password_confirmation: data.c_password,
+    };
+
+    console.log(resetData);
+
+    try {
+      const response = await fetch(
+        'http://127.0.0.1:8000/api/session/reset-password',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(resetData),
+        }
+      );
+
+      const result = await response.json();
+
+      console.log(result);
+
+      if (response.ok) {
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Reset password error:', error);
+    }
   };
+
   return (
     <>
       <div className="bg-gray-100 flex justify-center items-center min-h-screen p-4">
@@ -42,6 +86,7 @@ export const ResetPassword = () => {
             >
               Email
             </label>
+
             <input
               type="email"
               id="email"
@@ -50,6 +95,7 @@ export const ResetPassword = () => {
               {...register('email')}
             />
           </div>
+
           {errors.email && (
             <span className="text-sm text-red-500">{errors.email.message}</span>
           )}
@@ -62,6 +108,7 @@ export const ResetPassword = () => {
             >
               Password
             </label>
+
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -70,6 +117,7 @@ export const ResetPassword = () => {
                 className="border border-gray-300 rounded-lg p-2.5 pr-10 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 {...register('password')}
               />
+
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -79,6 +127,7 @@ export const ResetPassword = () => {
                 <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
               </button>
             </div>
+
             {errors.password && (
               <span className="text-sm text-red-500">
                 {errors.password.message}
@@ -94,6 +143,7 @@ export const ResetPassword = () => {
             >
               Confirm Password
             </label>
+
             <div className="relative">
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
@@ -102,6 +152,7 @@ export const ResetPassword = () => {
                 className="border border-gray-300 rounded-lg p-2.5 pr-10 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 {...register('c_password')}
               />
+
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -115,21 +166,23 @@ export const ResetPassword = () => {
                 />
               </button>
             </div>
+
             {errors.c_password && (
               <span className="text-sm text-red-500">
                 {errors.c_password.message}
               </span>
             )}
           </div>
+
           <button
             type="submit"
-            className="mt-4 bg-blue-600 text-white font-medium p-2.5 w-full rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-4 bg-blue-600 text-white font-medium p-2.5 w-full rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition"
           >
             Reset
           </button>
 
           <p className="text-center text-sm text-gray-600 mt-2">
-            Remembered Your passsword?{' '}
+            Remembered Your password?{' '}
             <Link to="/login" className="text-blue-600 hover:underline">
               Log in
             </Link>

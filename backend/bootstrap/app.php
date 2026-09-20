@@ -20,10 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
     $middleware->statefulApi();
 
     $middleware->validateCsrfTokens(except: [
-        'api/login',
-        'api/register',
-        'api/logout',
-    ]);
+    'api/login',
+    'api/register',
+    'api/logout',
+    'api/session/forget-password',
+    'api/session/reset-password',
+]);
 })
     ->withExceptions(function (Exceptions $exceptions): void {
     $exceptions->shouldRenderJsonWhen(

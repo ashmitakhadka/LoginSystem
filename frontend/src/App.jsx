@@ -11,7 +11,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import './App.css';
-import { ForgotPassword } from './components/forgetpassword';
+import ForgotPassword from './components/forgetpassword';
 import { ResetPassword } from './components/resetpassword';
 
 const App = () => {
@@ -49,7 +49,7 @@ const App = () => {
       element: <ForgotPassword />,
     },
     {
-      path: '/reset-password',
+      path: '/reset-password/:token',
       element: <ResetPassword />,
     },
   ]);
