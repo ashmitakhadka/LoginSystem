@@ -26,6 +26,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(data) {
+    console.log(data);
     setLoading(true);
 
     try {
@@ -119,11 +120,21 @@ const Login = () => {
             {errors.password.message}
           </span>
         )}
+
+        {/* Remember Me */}
+        <div className="flex items-center gap-2">
+          <input type="checkbox" id="remember" {...register('remember')} />
+
+          <label htmlFor="remember" className="text-sm text-gray-700">
+            Remember me
+          </label>
+        </div>
+
         <div className="flex justify-end">
           <p className="flex justify-center gap-2">
             <Link
               to="/forget-password"
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 hover:underline font-semibold"
             >
               Forgot Password
             </Link>
