@@ -13,7 +13,11 @@ Route::middleware('auth:sanctum')->group(function(){
     
     Route::get('/user-details', function(Request $request){
         return response()->json([
-            'user' => $request->user() 
+            'user'=>[
+            'email' => $request->user()->email,
+            'name'=> $request->user()->name,
+            'role'=> $request->user()->role,
+            ]
         ]);
     });
 

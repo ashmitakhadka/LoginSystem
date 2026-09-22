@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import ForgotPassword from './components/forgetpassword';
 import { ResetPassword } from './components/resetpassword';
+import { UserProfile } from './components/userprofile';
 
 const App = () => {
   const router = createBrowserRouter([
@@ -51,6 +52,10 @@ const App = () => {
     {
       path: '/reset-password/:token',
       element: <ResetPassword />,
+    },
+    {
+      path: '/user-profile',
+      element: <UserProfile />,
     },
   ]);
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { UserProfile } from './userprofile';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const Dashboard = () => {
 
         if (response.ok) {
           const data = await response.json();
+          console.log('USER API RESPONSE:', data);
           setUser(data.user);
         } else if (response.status === 401) {
           localStorage.removeItem('token');
@@ -130,16 +132,7 @@ const Dashboard = () => {
           Welcome, <span className="text-blue-600">{user.name}</span>!
         </p>
 
-        {/* User role */}
-        <span
-          className={`px-3 py-1 rounded-full text-sm font-semibold ${
-            user.role === 'admin'
-              ? 'bg-purple-100 text-purple-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}
-        >
-          Role: {user.role.toUpperCase()}
-        </span>
+        <UserProfile user={user} />
 
         {/* Admin-only button */}
         {user.role === 'admin' && (

@@ -26,7 +26,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(data) {
-    console.log(data);
     setLoading(true);
 
     try {
@@ -40,7 +39,7 @@ const Login = () => {
       });
 
       const result = await response.json();
-
+      console.log('TOKEN FROM LOGIN API:', result.token);
       // Laravel/API error
       if (!response.ok) {
         toast.error(result.message || 'Login failed');
