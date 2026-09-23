@@ -6,10 +6,7 @@ import { UserProfile } from './userprofile';
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState({
-    name: 'Loading...',
-    role: 'user',
-  });
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -30,7 +27,9 @@ const Dashboard = () => {
 
         if (response.ok) {
           const data = await response.json();
+
           console.log('USER API RESPONSE:', data);
+
           setUser(data.user);
         } else if (response.status === 401) {
           localStorage.removeItem('token');
@@ -71,7 +70,6 @@ const Dashboard = () => {
       console.error('Logout failed', error);
       toast.error('Unable to logout from the server.');
     } finally {
-      // Always remove local authentication data
       localStorage.removeItem('token');
       localStorage.removeItem('userRole');
 
@@ -79,7 +77,6 @@ const Dashboard = () => {
     }
   };
 
-  // Test protected admin route
   const testAdminRoute = async () => {
     const token = localStorage.getItem('token');
 
@@ -99,8 +96,10 @@ const Dashboard = () => {
         console.log('Admin stats:', data);
       } else if (response.status === 401) {
         toast.error('You are not authenticated.');
+
         localStorage.removeItem('token');
         localStorage.removeItem('userRole');
+
         navigate('/login');
       } else if (response.status === 403) {
         toast.error(data.message || 'You are not authorized to access this.');
@@ -128,14 +127,16 @@ const Dashboard = () => {
       </nav>
 
       <div className="flex flex-col items-center mt-20 gap-6">
-        <p className="text-2xl font-bold">
-          Welcome, <span className="text-blue-600">{user.name}</span>!
-        </p>
+        {user && (
+          <p className="text-2xl font-bold">
+            Welcome, <span className="text-blue-600">{user.name}</span>!
+          </p>
+        )}
 
-        <UserProfile user={user} />
+        {user && <UserProfile user={user} />}
 
         {/* Admin-only button */}
-        {user.role === 'admin' && (
+        {user && user.role === 'admin' && (
           <button
             onClick={testAdminRoute}
             className="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-600 transition flex items-center gap-2"
@@ -148,4 +149,5 @@ const Dashboard = () => {
     </>
   );
 };
+
 export default Dashboard;

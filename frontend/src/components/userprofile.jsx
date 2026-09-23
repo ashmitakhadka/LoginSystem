@@ -3,6 +3,7 @@ import { useState } from 'react';
 export const UserProfile = ({ user }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user.name);
+  const [editEmail, setEditEmail] = useState(user.email);
 
   function handleClick() {
     setIsEditing(true);
@@ -46,10 +47,20 @@ export const UserProfile = ({ user }) => {
         {/* Email */}
         <div className="flex items-center justify-between py-4">
           <span className="text-sm text-gray-500">Email</span>
-
-          <span className="ml-4 max-w-[220px] truncate text-right text-sm font-medium text-gray-800">
-            {user.email}
-          </span>
+          {isEditing ? (
+            <input
+              type="text"
+              className="w-52 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+              value={editEmail}
+              onChange={(event) => {
+                setEditEmail(event.target.value);
+              }}
+            />
+          ) : (
+            <span className="ml-4 max-w-[220px] truncate text-right text-sm font-medium text-gray-800">
+              {user.email}
+            </span>
+          )}
         </div>
 
         {/* Role */}
