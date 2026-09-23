@@ -1,4 +1,13 @@
+import { useState } from 'react';
+
 export const UserProfile = ({ user }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(user.name);
+
+  function handleClick() {
+    setIsEditing(true);
+  }
+
   return (
     <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-md">
       <div className="flex items-center gap-4 border-b border-gray-100 pb-5">
@@ -14,12 +23,27 @@ export const UserProfile = ({ user }) => {
       </div>
 
       <div className="divide-y divide-gray-100">
+        {/* Name */}
         <div className="flex items-center justify-between py-4">
           <span className="text-sm text-gray-500">Name</span>
 
-          <span className="text-sm font-medium text-gray-800">{user.name}</span>
+          {isEditing ? (
+            <input
+              type="text"
+              className="w-52 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+              value={editName}
+              onChange={(event) => {
+                setEditName(event.target.value);
+              }}
+            />
+          ) : (
+            <span className="text-sm font-medium text-gray-800">
+              {user.name}
+            </span>
+          )}
         </div>
 
+        {/* Email */}
         <div className="flex items-center justify-between py-4">
           <span className="text-sm text-gray-500">Email</span>
 
@@ -28,6 +52,7 @@ export const UserProfile = ({ user }) => {
           </span>
         </div>
 
+        {/* Role */}
         <div className="flex items-center justify-between py-4">
           <span className="text-sm text-gray-500">Role</span>
 
@@ -41,6 +66,16 @@ export const UserProfile = ({ user }) => {
             {user.role.toUpperCase()}
           </span>
         </div>
+      </div>
+
+      <div className="pt-5">
+        <button
+          type="button"
+          className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+          onClick={handleClick}
+        >
+          {isEditing ? 'Save Changes' : 'Edit Profile'}
+        </button>
       </div>
     </div>
   );
