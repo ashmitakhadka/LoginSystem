@@ -23,8 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
     'api/login',
     'api/register',
     'api/logout',
+    'api/user-profile',
     'api/session/forget-password',
     'api/session/reset-password',
+    
 ]);
 })
     ->withExceptions(function (Exceptions $exceptions): void {

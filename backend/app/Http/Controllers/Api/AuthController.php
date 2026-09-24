@@ -63,4 +63,28 @@ class AuthController extends Controller
         'message' => "Logged out successfully",
     ]);
 }
+
+public function updateProfile(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email',
+    ]);
+
+    $user = $request->user();
+
+    $user->update([
+        'name' => $request->name,
+        'email' => $request->email,
+    ]);
+
+    return response()->json([
+        'message' => 'Profile updated successfully',
+        'user' => [
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ],
+    ]);
+}
 }

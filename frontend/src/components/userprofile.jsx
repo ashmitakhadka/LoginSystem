@@ -1,12 +1,52 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 export const UserProfile = ({ user }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user.name);
   const [editEmail, setEditEmail] = useState(user.email);
 
-  function handleClick() {
-    setIsEditing(true);
+  async function handleClick() {
+    // First click: enter edit mode
+    if (!isEditing) {
+      setIsEditing(true);
+      return;
+    }
+
+    // Second click: save changes
+    try {
+      const token = localStorage.getItem('token');
+
+      console.log('TOKEN:', token);
+      const response = await fetch('http://127.0.0.1:8000/api/user-profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: editName,
+          email: editEmail,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.log(data);
+        toast.error(data.message || 'Profile update failed');
+        return;
+      }
+
+      console.log(data);
+
+      toast.success(data.message);
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
   }
 
   return (

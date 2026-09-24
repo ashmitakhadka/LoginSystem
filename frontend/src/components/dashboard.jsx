@@ -27,9 +27,6 @@ const Dashboard = () => {
 
         if (response.ok) {
           const data = await response.json();
-
-          console.log('USER API RESPONSE:', data);
-
           setUser(data.user);
         } else if (response.status === 401) {
           localStorage.removeItem('token');
