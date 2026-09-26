@@ -14,6 +14,7 @@ import './App.css';
 import ForgotPassword from './components/forgetpassword';
 import { ResetPassword } from './components/resetpassword';
 import { UserProfile } from './components/userprofile';
+import { ChangePassword } from './components/changepassword';
 
 const App = () => {
   const router = createBrowserRouter([
@@ -56,6 +57,10 @@ const App = () => {
     {
       path: '/user-profile',
       element: <UserProfile />,
+    },
+    {
+      path: '/change-password',
+      element: <ChangePassword />,
     },
   ]);
 

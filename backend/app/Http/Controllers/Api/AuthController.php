@@ -87,4 +87,19 @@ public function updateProfile(Request $request)
         ],
     ]);
 }
+
+public function changePassword(Request $request){
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email',
+    ]);
+     $user = $request->user();
+      $user->update([
+        'password' => $request->name, 
+    ]);
+    return response()->json([
+        'message'=> "Password updated successfully",
+        'user'=> $user->password,
+    ]);
+}
 }
