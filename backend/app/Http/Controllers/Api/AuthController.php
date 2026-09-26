@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -88,18 +89,28 @@ public function updateProfile(Request $request)
     ]);
 }
 
-public function changePassword(Request $request){
+public function changePassword(Request $request)
+{
     $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email',
+        'password' => 'required',
+        'new_password' => 'required|min:6',
+        'c_password' => 'required|same:new_password',
     ]);
-     $user = $request->user();
-      $user->update([
-        'password' => $request->name, 
+
+    $user = $request->user();
+
+    if (!Hash::check($request->password, $user->password)) {
+        return response()->json([
+            'message' => 'Current password is incorrect',
+        ], 422);
+    }
+
+    $user->update([
+        'password' => Hash::make($request->new_password),
     ]);
+
     return response()->json([
-        'message'=> "Password updated successfully",
-        'user'=> $user->password,
+        'message' => 'Password updated successfully',
     ]);
 }
 }

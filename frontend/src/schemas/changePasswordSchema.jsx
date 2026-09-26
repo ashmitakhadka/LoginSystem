@@ -16,7 +16,7 @@ export const changePasswordSchema = z
       .min(1, 'Please enter your new password')
       .min(6, 'Password must be at least 6 characters'),
   })
-  .refine((data) => data.password === data.c_password, {
+  .refine((data) => data.new_password === data.c_password, {
     message: 'Passwords do not match',
     path: ['c_password'],
   });

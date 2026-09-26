@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-export const UserProfile = ({ user }) => {
+export const UserProfile = ({ user, setUser }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user.name);
   const [editEmail, setEditEmail] = useState(user.email);
@@ -17,7 +17,11 @@ export const UserProfile = ({ user }) => {
     try {
       const token = localStorage.getItem('token');
 
-      console.log('TOKEN:', token);
+      if (!token) {
+        toast.error('You are not authenticated.');
+        return;
+      }
+
       const response = await fetch('http://127.0.0.1:8000/api/user-profile', {
         method: 'PUT',
         headers: {
@@ -41,11 +45,15 @@ export const UserProfile = ({ user }) => {
 
       console.log(data);
 
+      // Update the user displayed in Dashboard
+      setUser(data.user);
+
       toast.success(data.message);
 
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating profile:', error);
+      toast.error('Unable to update profile.');
     }
   }
 
@@ -87,6 +95,7 @@ export const UserProfile = ({ user }) => {
         {/* Email */}
         <div className="flex items-center justify-between py-4">
           <span className="text-sm text-gray-500">Email</span>
+
           {isEditing ? (
             <input
               type="text"

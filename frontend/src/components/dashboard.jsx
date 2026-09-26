@@ -130,7 +130,7 @@ const Dashboard = () => {
           </p>
         )}
 
-        {user && <UserProfile user={user} />}
+        {user && <UserProfile user={user} setUser={setUser} />}
 
         {/* Admin-only button */}
         {user && user.role === 'admin' && (
