@@ -121,14 +121,26 @@ public function getUsers(Request $request)
 
     foreach ($users as $user) {
        $userData[] = [
-           'name' => $user->name,
-          'email' => $user->email,
+          'id' => $user->id,
+    'name' => $user->name,
+    'email' => $user->email,
+    'role' => $user->role,
 ];
     }
 
     return response()->json([
         'message' => 'Users',
         'users' => $userData,
+    ]);
+}
+public function deleteUser($id)
+{
+    $user = User::findOrFail($id);
+
+    $user->delete();
+
+    return response()->json([
+        'message' => 'User deleted successfully'
     ]);
 }
 }

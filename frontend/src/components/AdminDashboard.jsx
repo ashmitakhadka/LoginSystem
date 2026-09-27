@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -88,6 +89,29 @@ const AdminDashboard = () => {
     localStorage.removeItem('userRole');
     navigate('/login');
   };
+  const handleDelete = async (id) => {
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/users/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUsers((users) => users.filter((user) => user.id !== id));
+        toast.success(data.message);
+      } else {
+        console.log('Failed to delete user');
+      }
+    } catch (error) {
+      toast.error('Failed to delete user');
+    }
+  };
 
   return (
     <>
@@ -142,7 +166,10 @@ const AdminDashboard = () => {
 
               {/* Action */}
               <div className="col-span-1 text-right">
-                <button className="text-red-500 hover:text-red-700 cursor-pointer">
+                <button
+                  className="text-red-500 hover:text-red-700 cursor-pointer"
+                  onClick={() => handleDelete(user.id)}
+                >
                   <i className="fa-solid fa-trash"></i>
                 </button>
               </div>
