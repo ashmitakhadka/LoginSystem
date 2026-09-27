@@ -113,4 +113,17 @@ public function changePassword(Request $request)
         'message' => 'Password updated successfully',
     ]);
 }
+public function getUsers(Request $request){
+
+    $user = User::all();
+
+    return response()->json([
+         'message' => 'Users',
+        'user' => [
+            'name' => $user->name,
+            'email' => $user->email,
+    
+        ],
+    ]);
+}
 }

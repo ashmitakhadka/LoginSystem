@@ -15,6 +15,7 @@ import ForgotPassword from './components/forgetpassword';
 import { ResetPassword } from './components/resetpassword';
 import { UserProfile } from './components/userprofile';
 import { ChangePassword } from './components/changepassword';
+import { ProtectedRoute } from './components/protectedroute';
 
 const App = () => {
   const router = createBrowserRouter([
@@ -32,7 +33,11 @@ const App = () => {
     },
     {
       path: '/dashboard',
-      element: <Dashboard />,
+      element: (
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      ),
     },
     {
       path: '/admin-dashboard',
@@ -56,11 +61,19 @@ const App = () => {
     },
     {
       path: '/user-profile',
-      element: <UserProfile />,
+      element: (
+        <ProtectedRoute>
+          <UserProfile />
+        </ProtectedRoute>
+      ),
     },
     {
       path: '/change-password',
-      element: <ChangePassword />,
+      element: (
+        <ProtectedRoute>
+          <ChangePassword />
+        </ProtectedRoute>
+      ),
     },
   ]);
 

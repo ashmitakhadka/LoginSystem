@@ -5,8 +5,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 export const ChangePassword = () => {
+  const navigate = useNavigate();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -47,6 +49,7 @@ export const ChangePassword = () => {
       }
 
       toast.success(result.message || 'Password updated successfully');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Error changing password:', error);
       toast.error('Unable to connect to the server.');

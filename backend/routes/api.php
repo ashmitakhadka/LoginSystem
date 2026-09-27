@@ -20,7 +20,6 @@ Route::middleware('auth:sanctum')->group(function(){
             ]
         ]);
     });
-
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::put('/user-profile', [AuthController::class, 'updateProfile']);
@@ -34,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function(){
                 'message' => 'Welcome Admin! You have access to secret data.',
             ]);
         });
+        Route::get('/users', [AuthController::class, 'getUsers']);
         
     });
 
