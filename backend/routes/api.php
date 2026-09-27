@@ -34,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function(){
             ]);
         });
         Route::get('/users', [AuthController::class, 'getUsers']);
+        Route::delete('/users/{id}', [AuthController::class, 'deleteUser']);
         
     });
 

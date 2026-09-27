@@ -5,6 +5,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState('Admin');
   const [stats, setStats] = useState(null);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -31,6 +32,23 @@ const AdminDashboard = () => {
       }
     };
 
+    async function fetchUsers() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/users', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUsers(data.users);
+        }
+      } catch (error) {
+        console.error('Failed to fetch users', error);
+      }
+    }
+
     // Fetch admin stats from the protected route
     const fetchAdminStats = async () => {
       try {
@@ -52,7 +70,7 @@ const AdminDashboard = () => {
         console.error('Failed to fetch stats', error);
       }
     };
-
+    fetchUsers();
     fetchUserData();
     fetchAdminStats();
   }, [navigate]);
@@ -91,10 +109,46 @@ const AdminDashboard = () => {
         <p className="text-2xl font-bold">
           Welcome Admin, <span className="text-blue-600">{userName}</span>!
         </p>
+      </div>
+      <div className="mt-12 mx-10 md:mx-20 lg:mx-40 bg-gray-50 rounded-xl p-6 border border-gray-200">
+        <h2 className="text-2xl font-bold mb-6">All Users</h2>
 
-        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800">
-          Role: ADMIN
-        </span>
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          {/* Table Header */}
+          <div className="grid grid-cols-12 items-center bg-gray-100 px-6 py-4 font-semibold text-gray-700">
+            <div className="col-span-3">Name</div>
+            <div className="col-span-5">Email</div>
+            <div className="col-span-3">Role</div>
+            <div className="col-span-1 text-right">Action</div>
+          </div>
+
+          {users.map((user) => (
+            <div
+              key={user.id}
+              className="grid grid-cols-12 items-center px-6 py-4 border-t border-gray-200 hover:bg-gray-50"
+            >
+              {/* Name */}
+              <div className="col-span-3 font-medium">{user.name}</div>
+
+              {/* Email */}
+              <div className="col-span-5 text-gray-600">{user.email}</div>
+
+              {/* Role */}
+              <div className="col-span-3">
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                  {user.role}
+                </span>
+              </div>
+
+              {/* Action */}
+              <div className="col-span-1 text-right">
+                <button className="text-red-500 hover:text-red-700 cursor-pointer">
+                  <i className="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );
