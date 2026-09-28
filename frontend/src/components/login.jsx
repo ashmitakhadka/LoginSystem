@@ -7,8 +7,10 @@ import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { API_BASE_URL } from '../api';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
+  const { login } = useAuth();
   // Controls whether the password is visible or hidden
   const [showPassword, setShowPassword] = useState(false);
 
@@ -40,21 +42,15 @@ const Login = () => {
       });
 
       const result = await response.json();
-      console.log('TOKEN FROM LOGIN API:', result.token);
-      // Laravel/API error
+
       if (!response.ok) {
         toast.error(result.message || 'Login failed');
         return;
       }
 
-      // Successful login
+      // Successful login via AuthContext
       toast.success(result.message || 'Login successful!');
-
-      // Store authentication token and role
-      localStorage.setItem('token', result.token);
-      if (result.user?.role) {
-        localStorage.setItem('userRole', result.user.role);
-      }
+      login(result.token, result.user, !!data.remember);
 
       // Redirect based on role
       if (result.user?.role === 'admin') {

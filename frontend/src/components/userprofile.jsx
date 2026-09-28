@@ -1,52 +1,67 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { User } from 'lucide-react';
 import { API_BASE_URL } from '../api';
+import { useAuth } from '../context/AuthContext';
 
 export const UserProfile = ({ user: propUser, setUser: propSetUser }) => {
+  const { user: authUser, updateUser: authUpdateUser, token: authToken } = useAuth();
   const [internalUser, setInternalUser] = useState(null);
-  const [loading, setLoading] = useState(!propUser);
 
-  const currentUser = propUser || internalUser;
+  const currentUser = propUser || authUser || internalUser;
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState(currentUser?.name || '');
-  const [editEmail, setEditEmail] = useState(currentUser?.email || '');
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
 
-  // If no user prop was provided, fetch it directly
+  // If no user prop or context user was provided, fetch it directly
   useEffect(() => {
-    if (!propUser) {
-      const fetchProfile = async () => {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-
-        try {
-          const response = await fetch(`${API_BASE_URL}/user-details`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: 'application/json',
-            },
-          });
-          if (response.ok) {
-            const data = await response.json();
-            setInternalUser(data.user);
-          }
-        } catch (error) {
-          console.error('Failed to fetch profile', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchProfile();
+    if (propUser || authUser) {
+      return;
     }
-  }, [propUser]);
+
+    const token =
+      authToken ||
+      localStorage.getItem('token') ||
+      sessionStorage.getItem('token');
+
+    if (!token) {
+      return;
+    }
+
+    let isMounted = true;
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/user-details`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+          },
+        });
+        if (response.ok && isMounted) {
+          const data = await response.json();
+          setInternalUser(data.user);
+        }
+      } catch (error) {
+        console.error('Failed to fetch profile', error);
+      }
+    };
+
+    fetchProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [propUser, authUser, authToken]);
 
   const updateUserData = (updatedUser) => {
     if (propSetUser) {
       propSetUser(updatedUser);
-    } else {
-      setInternalUser(updatedUser);
     }
+    if (authUpdateUser) {
+      authUpdateUser(updatedUser);
+    }
+    setInternalUser(updatedUser);
   };
 
   async function handleClick() {
@@ -60,7 +75,10 @@ export const UserProfile = ({ user: propUser, setUser: propSetUser }) => {
 
     // Second click: save changes
     try {
-      const token = localStorage.getItem('token');
+      const token =
+        authToken ||
+        localStorage.getItem('token') ||
+        sessionStorage.getItem('token');
 
       if (!token) {
         toast.error('You are not authenticated.');
@@ -96,7 +114,7 @@ export const UserProfile = ({ user: propUser, setUser: propSetUser }) => {
     }
   }
 
-  if (loading || !currentUser) {
+  if (!currentUser) {
     return (
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-md text-center text-gray-500">
         Loading profile...
@@ -108,7 +126,7 @@ export const UserProfile = ({ user: propUser, setUser: propSetUser }) => {
     <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-md">
       <div className="flex items-center gap-4 border-b border-gray-100 pb-5">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
-          <i className="fa-solid fa-user text-xl text-blue-600"></i>
+          <User className="w-7 h-7 text-blue-600" />
         </div>
 
         <div>

@@ -1,83 +1,26 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { LogOut, Shield, KeyRound, LayoutDashboard } from 'lucide-react';
 import { UserProfile } from './userprofile';
+import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../api';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/user-details`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data.user);
-        } else if (response.status === 401) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('userRole');
-
-          toast.error('Session expired. Please login again.');
-          navigate('/login');
-        } else {
-          toast.error('Failed to load user information.');
-        }
-      } catch (error) {
-        console.error('Failed to fetch user data', error);
-        toast.error('Unable to connect to the server.');
-      }
-    };
-
-    fetchUserData();
-  }, [navigate]);
+  const { user, updateUser, logout, isAdmin, token } = useAuth();
 
   const handleLogout = async () => {
-    const token = localStorage.getItem('token');
-
     try {
-      const response = await fetch(`${API_BASE_URL}/logout`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        toast.success('Logged out successfully!');
-      } else {
-        toast.error('Logout failed.');
-      }
-    } catch (error) {
-      console.error('Logout failed', error);
-      toast.error('Unable to logout from the server.');
+      await logout();
+      toast.success('Logged out successfully!');
+    } catch {
+      toast.error('Unable to logout cleanly.');
     } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userRole');
-
       navigate('/login');
     }
   };
 
   const testAdminRoute = async () => {
-    const token = localStorage.getItem('token');
-
     try {
       const response = await fetch(`${API_BASE_URL}/admin/stats`, {
         headers: {
@@ -90,14 +33,9 @@ const Dashboard = () => {
 
       if (response.ok) {
         toast.success(data.message || 'Admin stats accessed successfully!');
-
-        console.log('Admin stats:', data);
       } else if (response.status === 401) {
         toast.error('You are not authenticated.');
-
-        localStorage.removeItem('token');
-        localStorage.removeItem('userRole');
-
+        logout();
         navigate('/login');
       } else if (response.status === 403) {
         toast.error(data.message || 'You are not authorized to access this.');
@@ -112,35 +50,58 @@ const Dashboard = () => {
 
   return (
     <>
-      <nav className="flex justify-between bg-blue-100 items-center py-4 px-40">
-        <div className="font-semibold text-black-700">My App</div>
+      <nav className="flex justify-between bg-blue-100 items-center py-4 px-6 md:px-20 lg:px-40 shadow-sm">
+        <div className="flex items-center gap-2 font-semibold text-gray-800 text-lg">
+          <LayoutDashboard className="w-5 h-5 text-blue-600" />
+          <span>My App</span>
+        </div>
 
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 rounded-lg px-4 py-2 font-semibold text-black-700 cursor-pointer transition duration-200 hover:bg-red-500 hover:text-white"
-        >
-          <i className="fa-solid fa-right-from-bracket"></i>
-          Logout
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/change-password"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-blue-200 transition"
+          >
+            <KeyRound className="w-4 h-4" />
+            <span>Change Password</span>
+          </Link>
+
+          {isAdmin && (
+            <Link
+              to="/admin-dashboard"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium bg-purple-600 text-white hover:bg-purple-700 transition"
+            >
+              <Shield className="w-4 h-4" />
+              <span>Admin Panel</span>
+            </Link>
+          )}
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-700 cursor-pointer transition hover:bg-red-500 hover:text-white"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
+          </button>
+        </div>
       </nav>
 
-      <div className="flex flex-col items-center mt-20 gap-6">
+      <div className="flex flex-col items-center mt-12 gap-6 px-4">
         {user && (
-          <p className="text-2xl font-bold">
+          <p className="text-2xl font-bold text-gray-800">
             Welcome, <span className="text-blue-600">{user.name}</span>!
           </p>
         )}
 
-        {user && <UserProfile user={user} setUser={setUser} />}
+        {user && <UserProfile user={user} setUser={updateUser} />}
 
-        {/* Admin-only button */}
-        {user && user.role === 'admin' && (
+        {/* Admin-only action button */}
+        {isAdmin && (
           <button
             onClick={testAdminRoute}
-            className="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-600 transition flex items-center gap-2"
+            className="bg-purple-600 text-white px-6 py-2.5 rounded-lg hover:bg-purple-700 transition flex items-center gap-2 font-medium cursor-pointer shadow-sm"
           >
-            <i className="fa-solid fa-shield-halved"></i>
-            Access Admin Stats
+            <Shield className="w-4 h-4" />
+            <span>Test Admin Endpoint</span>
           </button>
         )}
       </div>

@@ -16,6 +16,7 @@ import { ResetPassword } from './components/resetpassword';
 import { UserProfile } from './components/userprofile';
 import { ChangePassword } from './components/changepassword';
 import { ProtectedRoute } from './components/protectedroute';
+import { AuthProvider } from './context/AuthContext';
 
 const App = () => {
   const router = createBrowserRouter([
@@ -82,10 +83,10 @@ const App = () => {
   ]);
 
   return (
-    <>
+    <AuthProvider>
       <ToastContainer />
       <RouterProvider router={router} />
-    </>
+    </AuthProvider>
   );
 };
 

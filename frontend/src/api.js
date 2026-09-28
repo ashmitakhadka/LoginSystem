@@ -4,7 +4,8 @@ export const API_BASE_URL =
   import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 export const apiFetch = async (endpoint, options = {}) => {
-  const token = localStorage.getItem('token');
+  const token =
+    localStorage.getItem('token') || sessionStorage.getItem('token');
 
   const headers = {
     Accept: 'application/json',
@@ -25,6 +26,7 @@ export const apiFetch = async (endpoint, options = {}) => {
 
   if (response.status === 401) {
     localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     localStorage.removeItem('userRole');
     if (window.location.pathname !== '/login') {
       window.location.href = '/login';

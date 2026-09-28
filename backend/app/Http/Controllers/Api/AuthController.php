@@ -45,15 +45,16 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
         $token = $user->createToken('api-token')->plainTextToken;
 
-        // Inside your login() method, change the return statement to:
-       return response()->json([
-      'message' => 'Login successful',
-      'token' => $token,
-      'user' => [
-       'name' => $user->name,
-        'role' => $user->role // <--- ADD THIS LINE
-    ]
-]);
+        return response()->json([
+            'message' => 'Login successful',
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+            ],
+        ]);
     }
 
     public function logout(Request $request){
@@ -82,6 +83,7 @@ public function updateProfile(Request $request)
     return response()->json([
         'message' => 'Profile updated successfully',
         'user' => [
+            'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
             'role' => $user->role,
@@ -147,6 +149,33 @@ public function deleteUser(Request $request, $id)
 
     return response()->json([
         'message' => 'User deleted successfully'
+    ]);
+}
+
+public function updateUserRole(Request $request, $id)
+{
+    $request->validate([
+        'role' => 'required|in:admin,user',
+    ]);
+
+    if ($request->user()->id == $id && $request->role !== 'admin') {
+        return response()->json([
+            'message' => 'You cannot demote yourself from admin.'
+        ], 400);
+    }
+
+    $user = User::findOrFail($id);
+    $user->role = $request->role;
+    $user->save();
+
+    return response()->json([
+        'message' => 'User role updated successfully',
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ]
     ]);
 }
 }

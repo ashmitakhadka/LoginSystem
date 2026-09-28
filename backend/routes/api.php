@@ -16,9 +16,10 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/user-details', function(Request $request){
         return response()->json([
             'user'=>[
-            'email' => $request->user()->email,
-            'name'=> $request->user()->name,
-            'role'=> $request->user()->role,
+                'id' => $request->user()->id,
+                'email' => $request->user()->email,
+                'name'=> $request->user()->name,
+                'role'=> $request->user()->role,
             ]
         ]);
     });
@@ -37,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function(){
         });
         Route::get('/users', [AuthController::class, 'getUsers']);
         Route::delete('/users/{id}', [AuthController::class, 'deleteUser']);
+        Route::patch('/users/{id}/role', [AuthController::class, 'updateUserRole']);
         
     });
 

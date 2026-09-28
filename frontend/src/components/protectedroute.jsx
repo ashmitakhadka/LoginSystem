@@ -1,14 +1,22 @@
 import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export const ProtectedRoute = ({ children, requiredRole }) => {
-  const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole');
+  const { isAuthenticated, loading, isAdmin } = useAuth();
 
-  if (!token) {
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-600">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && userRole !== requiredRole) {
+  if (requiredRole === 'admin' && !isAdmin) {
     return <Navigate to="/dashboard" replace />;
   }
 
