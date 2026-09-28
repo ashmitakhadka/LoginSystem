@@ -10,6 +10,8 @@ import {
   useParams,
   useSearchParams,
 } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../api';
 
 export const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -40,30 +42,27 @@ export const ResetPassword = () => {
       password_confirmation: data.c_password,
     };
 
-    console.log(resetData);
-
     try {
-      const response = await fetch(
-        'http://127.0.0.1:8000/api/session/reset-password',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify(resetData),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(resetData),
+      });
 
       const result = await response.json();
 
-      console.log(result);
-
       if (response.ok) {
+        toast.success(result.message || 'Password reset successfully!');
         navigate('/login');
+      } else {
+        toast.error(result.message || 'Password reset failed.');
       }
     } catch (error) {
       console.error('Reset password error:', error);
+      toast.error('Unable to connect to the server.');
     }
   };
 

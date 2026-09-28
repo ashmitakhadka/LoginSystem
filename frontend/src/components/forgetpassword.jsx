@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { forgotPasswordSchema } from '../schemas/forgetPasswordSchema';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../api';
 
 export default function ForgotPassword() {
   const {
@@ -15,20 +16,15 @@ export default function ForgotPassword() {
   });
 
   const onSubmit = async (data) => {
-    console.log(data);
-
     try {
-      const response = await fetch(
-        'http://127.0.0.1:8000/api/session/forget-password',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/forget-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
 
       const result = await response.json();
 

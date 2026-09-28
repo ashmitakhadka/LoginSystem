@@ -23,7 +23,8 @@ class PasswordResetMail extends Mailable
         public $user,
         public $token)
     {
-       $this->resetUrl = 'http://localhost:5173/reset-password/' . $token . '?email=' . urlencode($user->email);
+       $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+       $this->resetUrl = rtrim($frontendUrl, '/') . '/reset-password/' . $token . '?email=' . urlencode($user->email);
     }
 
     /**

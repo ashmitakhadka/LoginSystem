@@ -1,14 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../api';
 
-export const UserProfile = ({ user, setUser }) => {
+export const UserProfile = ({ user: propUser, setUser: propSetUser }) => {
+  const [internalUser, setInternalUser] = useState(null);
+  const [loading, setLoading] = useState(!propUser);
+
+  const currentUser = propUser || internalUser;
+
   const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState(user.name);
-  const [editEmail, setEditEmail] = useState(user.email);
+  const [editName, setEditName] = useState(currentUser?.name || '');
+  const [editEmail, setEditEmail] = useState(currentUser?.email || '');
+
+  // If no user prop was provided, fetch it directly
+  useEffect(() => {
+    if (!propUser) {
+      const fetchProfile = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/user-details`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+            },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setInternalUser(data.user);
+          }
+        } catch (error) {
+          console.error('Failed to fetch profile', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchProfile();
+    }
+  }, [propUser]);
+
+  const updateUserData = (updatedUser) => {
+    if (propSetUser) {
+      propSetUser(updatedUser);
+    } else {
+      setInternalUser(updatedUser);
+    }
+  };
 
   async function handleClick() {
-    // First click: enter edit mode
+    // First click: enter edit mode and populate current values
     if (!isEditing) {
+      setEditName(currentUser?.name || '');
+      setEditEmail(currentUser?.email || '');
       setIsEditing(true);
       return;
     }
@@ -22,7 +67,7 @@ export const UserProfile = ({ user, setUser }) => {
         return;
       }
 
-      const response = await fetch('http://127.0.0.1:8000/api/user-profile', {
+      const response = await fetch(`${API_BASE_URL}/user-profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -38,23 +83,25 @@ export const UserProfile = ({ user, setUser }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        console.log(data);
         toast.error(data.message || 'Profile update failed');
         return;
       }
 
-      console.log(data);
-
-      // Update the user displayed in Dashboard
-      setUser(data.user);
-
-      toast.success(data.message);
-
+      updateUserData(data.user);
+      toast.success(data.message || 'Profile updated successfully');
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Unable to update profile.');
     }
+  }
+
+  if (loading || !currentUser) {
+    return (
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-md text-center text-gray-500">
+        Loading profile...
+      </div>
+    );
   }
 
   return (
@@ -65,9 +112,8 @@ export const UserProfile = ({ user, setUser }) => {
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold text-gray-800">{user.name}</h2>
-
-          <p className="text-sm text-gray-500">{user.email}</p>
+          <h2 className="text-lg font-semibold text-gray-800">{currentUser.name}</h2>
+          <p className="text-sm text-gray-500">{currentUser.email}</p>
         </div>
       </div>
 
@@ -87,7 +133,7 @@ export const UserProfile = ({ user, setUser }) => {
             />
           ) : (
             <span className="text-sm font-medium text-gray-800">
-              {user.name}
+              {currentUser.name}
             </span>
           )}
         </div>
@@ -107,7 +153,7 @@ export const UserProfile = ({ user, setUser }) => {
             />
           ) : (
             <span className="ml-4 max-w-[220px] truncate text-right text-sm font-medium text-gray-800">
-              {user.email}
+              {currentUser.email}
             </span>
           )}
         </div>
@@ -118,12 +164,12 @@ export const UserProfile = ({ user, setUser }) => {
 
           <span
             className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              user.role === 'admin'
+              currentUser.role === 'admin'
                 ? 'bg-purple-100 text-purple-700'
                 : 'bg-gray-100 text-gray-700'
             }`}
           >
-            {user.role.toUpperCase()}
+            {(currentUser.role || 'user').toUpperCase()}
           </span>
         </div>
       </div>
@@ -131,7 +177,7 @@ export const UserProfile = ({ user, setUser }) => {
       <div className="pt-5">
         <button
           type="button"
-          className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+          className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
           onClick={handleClick}
         >
           {isEditing ? 'Save Changes' : 'Edit Profile'}
@@ -140,3 +186,5 @@ export const UserProfile = ({ user, setUser }) => {
     </div>
   );
 };
+
+export default UserProfile;

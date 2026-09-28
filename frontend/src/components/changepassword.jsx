@@ -6,6 +6,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../api';
 
 export const ChangePassword = () => {
   const navigate = useNavigate();
@@ -28,9 +29,7 @@ export const ChangePassword = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch(
-        'http://127.0.0.1:8000/api/change-password',
-        {
+      const response = await fetch(`${API_BASE_URL}/change-password`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',

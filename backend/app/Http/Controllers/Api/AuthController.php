@@ -133,8 +133,14 @@ public function getUsers(Request $request)
         'users' => $userData,
     ]);
 }
-public function deleteUser($id)
+public function deleteUser(Request $request, $id)
 {
+    if ($request->user()->id == $id) {
+        return response()->json([
+            'message' => 'You cannot delete your own account.'
+        ], 400);
+    }
+
     $user = User::findOrFail($id);
 
     $user->delete();

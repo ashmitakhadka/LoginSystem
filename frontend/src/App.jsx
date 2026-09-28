@@ -41,7 +41,11 @@ const App = () => {
     },
     {
       path: '/admin-dashboard',
-      element: <AdminDashboard />,
+      element: (
+        <ProtectedRoute requiredRole="admin">
+          <AdminDashboard />
+        </ProtectedRoute>
+      ),
     },
     {
       path: '/session-login',

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { API_BASE_URL } from '../api';
 
 const Login = () => {
   // Controls whether the password is visible or hidden
@@ -29,7 +30,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/login', {
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,8 +50,11 @@ const Login = () => {
       // Successful login
       toast.success(result.message || 'Login successful!');
 
-      // Store authentication token
+      // Store authentication token and role
       localStorage.setItem('token', result.token);
+      if (result.user?.role) {
+        localStorage.setItem('userRole', result.user.role);
+      }
 
       // Redirect based on role
       if (result.user?.role === 'admin') {

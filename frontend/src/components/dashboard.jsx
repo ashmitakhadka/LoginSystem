@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { UserProfile } from './userprofile';
+import { API_BASE_URL } from '../api';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Dashboard = () => {
       }
 
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/user-details', {
+        const response = await fetch(`${API_BASE_URL}/user-details`, {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: 'application/json',
@@ -50,7 +51,7 @@ const Dashboard = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/logout', {
+      const response = await fetch(`${API_BASE_URL}/logout`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -78,7 +79,7 @@ const Dashboard = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/admin/stats', {
+      const response = await fetch(`${API_BASE_URL}/admin/stats`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',

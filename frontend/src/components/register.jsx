@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { API_BASE_URL } from '../api';
 
 const Register = () => {
   // Controls password visibility separately
@@ -30,7 +31,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/register', {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

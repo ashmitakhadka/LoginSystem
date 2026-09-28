@@ -16,11 +16,11 @@ class EnsureUserIsAdmin
 
        public function handle(Request $request, Closure $next)
    {
-       // If the user is logged in BUT their role is not 'admin', block them.
-       if ($request->user() && $request->user()->role !== 'admin') {
+       // If the user is not logged in or their role is not 'admin', block them.
+       if (!$request->user() || $request->user()->role !== 'admin') {
            return response()->json(['message' => 'Unauthorized. Admins only.'], 403);
        }
 
-       return $next($request); // Otherwise, let them through.
+       return $next($request);
    }
 }

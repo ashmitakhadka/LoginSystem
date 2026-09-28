@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../api';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const AdminDashboard = () => {
     // Fetch user details to get the name
     const fetchUserData = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/user-details', {
+        const response = await fetch(`${API_BASE_URL}/user-details`, {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: 'application/json',
@@ -35,7 +36,7 @@ const AdminDashboard = () => {
 
     async function fetchUsers() {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/users', {
+        const response = await fetch(`${API_BASE_URL}/users`, {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: 'application/json',
@@ -53,7 +54,7 @@ const AdminDashboard = () => {
     // Fetch admin stats from the protected route
     const fetchAdminStats = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/admin/stats', {
+        const response = await fetch(`${API_BASE_URL}/admin/stats`, {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: 'application/json',
@@ -64,7 +65,7 @@ const AdminDashboard = () => {
           setStats(data);
         } else {
           // If the backend rejects them, kick them out
-          alert('Access Denied! You are not an admin.');
+          toast.error('Access Denied! You are not an admin.');
           navigate('/dashboard');
         }
       } catch (error) {
@@ -78,22 +79,31 @@ const AdminDashboard = () => {
 
   const handleLogout = async () => {
     const token = localStorage.getItem('token');
-    await fetch('http://127.0.0.1:8000/api/logout', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
-    });
+    try {
+      await fetch(`${API_BASE_URL}/logout`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+        },
+      });
+    } catch {
+      // ignore network errors on logout
+    }
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
     navigate('/login');
   };
+
   const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) {
+      return;
+    }
+
     const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/users/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/users/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -101,14 +111,16 @@ const AdminDashboard = () => {
         },
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
-        setUsers((users) => users.filter((user) => user.id !== id));
-        toast.success(data.message);
+        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+        toast.success(data.message || 'User deleted successfully');
       } else {
-        console.log('Failed to delete user');
+        toast.error(data.message || 'Failed to delete user');
       }
-    } catch (error) {
+    } catch (err) {
+      console.error('Delete user error:', err);
       toast.error('Failed to delete user');
     }
   };
@@ -129,10 +141,15 @@ const AdminDashboard = () => {
         </button>
       </nav>
 
-      <div className="flex flex-col items-center mt-20 gap-6">
+      <div className="flex flex-col items-center mt-12 gap-3">
         <p className="text-2xl font-bold">
           Welcome Admin, <span className="text-blue-600">{userName}</span>!
         </p>
+        {stats?.message && (
+          <span className="text-sm bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full border border-blue-200">
+            {stats.message}
+          </span>
+        )}
       </div>
       <div className="mt-12 mx-10 md:mx-20 lg:mx-40 bg-gray-50 rounded-xl p-6 border border-gray-200">
         <h2 className="text-2xl font-bold mb-6">All Users</h2>
